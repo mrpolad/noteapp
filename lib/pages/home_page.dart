@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.green,
         title: const Text('Task List'),
         actions: [
           DropdownButton<String>(
@@ -55,13 +56,14 @@ class _HomePageState extends State<HomePage> {
                 selectedCategory = newValue!;
               });
             },
-            items: ["In Progress", "Done"]
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+            items: ["In Progress", "Done"].map<DropdownMenuItem<String>>(
+              (String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              },
+            ).toList(),
           ),
         ],
       ),
