@@ -1,63 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../main.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _textEditController = TextEditingController();
-  int index = 0;
+  final TextEditingController _taskTextController = TextEditingController();
+  final TextEditingController _descriptionTextController =
+      TextEditingController();
+  String selectedCategory = "In Progress";
+
+  final Map<String, List<Map<String, String>>> taskCategories = {
+    "In Progress": [],
+    "Done": [],
+  };
+
   void addTask() {
+    final String task = _taskTextController.text;
+    final String description = _descriptionTextController.text;
+
     setState(() {
-      taskList.add(_textEditController.text);
-      _textEditController.clear();
+      taskCategories[selectedCategory]!.add({
+        "task": task,
+        "description": description,
+      });
+
+      _taskTextController.clear();
+      _descriptionTextController.clear();
     });
   }
 
-  void clearTask() {
+  void clearTask(int index) {
     setState(() {
-      taskList.removeAt(index);
+      taskCategories[selectedCategory]!.removeAt(index);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-          child: TextFormField(
-            controller: _textEditController,
-            decoration: InputDecoration(
-              border: const UnderlineInputBorder(),
-              labelText: 'Add Task',
-              suffixIcon: IconButton(
-                onPressed: addTask,
-                icon: const FaIcon(FontAwesomeIcons.plus),
+    List<Map<String, String>> currentList = taskCategories[selectedCategory]!;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Task List'),
+        actions: [
+          DropdownButton<String>(
+            value: selectedCategory,
+            onChanged: (newValue) {
+              setState(() {
+                selectedCategory = newValue!;
+              });
+            },
+            items: ["In Progress", "Done"]
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    controller: _taskTextController,
+                    decoration: const InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: 'Task',
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _descriptionTextController,
+                    decoration: const InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: 'Description',
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: addTask,
+                  child: Text("Add to $selectedCategory"),
+                ),
+              ],
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: currentList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(currentList[index]["task"] ?? ""),
+                  subtitle: Text(currentList[index]["description"] ?? ""),
+                  leading: IconButton(
+                    onPressed: () => clearTask(index),
+                    icon: const Icon(Icons.delete),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: taskList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(taskList[index]),
-                leading: IconButton(
-                    onPressed: clearTask, icon: const Icon(Icons.delete)),
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

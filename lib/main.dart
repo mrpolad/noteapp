@@ -11,13 +11,11 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-final List<String> taskList = [];
-
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Task',
+      title: 'To do App',
       home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
